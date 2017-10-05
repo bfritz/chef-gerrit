@@ -36,12 +36,12 @@ platforms:
       - RUN /usr/bin/apt-get install apt-transport-https lsb-release procps net-tools -y
 
 # comment this out, if Debian 7 is not needed
-- name: debian-7
-  driver:
-    image: debian:7
-    intermediate_instructions:
-      - RUN /usr/bin/apt-get update
-      - RUN /usr/bin/apt-get install apt-transport-https lsb-release procps net-tools -y
+#- name: debian-7
+#  driver:
+#    image: debian:7
+#    intermediate_instructions:
+#      - RUN /usr/bin/apt-get update
+#      - RUN /usr/bin/apt-get install apt-transport-https lsb-release procps net-tools -y
 
 # suites are taken from .kitchen.yml usually
 # suites:
