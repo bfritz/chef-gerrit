@@ -82,10 +82,8 @@ module Gerrit
       return result
     end
 
-    def wait_until_ready!
+    def wait_until_ready!(endpoint, status)
       timeout = 60
-      # the listen URL can be something like proxy-https://*:8080 or https://example.com:443 or proxy-http://127.0.0.1:8080 etc.
-      endpoint = node['gerrit']['config']['httpd']['listenUrl'].sub('proxy-https', 'http').sub('proxy-http', 'http').sub('*', 'localhost')
       Timeout.timeout(timeout, ConnectTimeout) do
         begin
           open(endpoint)
@@ -95,10 +93,7 @@ module Gerrit
           Errno::ENETUNREACH,
           Timeout::Error,
           OpenURI::HTTPError => e
-          # If authentication has been enabled, the server will return an HTTP
-          # 403. This is "OK", since it means that the server is actually
-          # ready to accept requests.
-          return if e.message =~ /^403/
+          return if e.message =~ /^#{status}/
 
           Chef::Log.debug("Gerrit is not accepting requests - #{e.message}")
           sleep(0.5)

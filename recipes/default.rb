@@ -58,6 +58,10 @@ end
 
 ruby_block "wait_until_ready" do
   block do
-    wait_until_ready!
+#     # listenUri = URI()
+#     # uri = "#{listenUri.scheme}://localhost:#{listenUri.port}"
+#     uri = node['gerrit']['config']['httpd']['listenUrl'].sub('proxy-', '')
+#     Chef::Log.info "Waiting for #{uri}"
+#     wait_until_ready!(uri, 301)
   end
 end
