@@ -21,7 +21,7 @@ control 'gerrit-1' do
   end
 
   # port 8080 HTML
-  describe command('wget --retry-connrefused --server-response --timeout 60 --output-document - http://localhost:8080') do
+  describe command('curl http://localhost:8080') do
     its('exit_status') { should eq 0 }
     its('stdout') { should include '<title>Gerrit Code Review</title>' }
   end

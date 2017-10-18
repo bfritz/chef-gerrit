@@ -28,11 +28,11 @@ platforms:
       - recipe[gerrit_test::wget]
 
 suites:
-  - name: DB-H2
+  - name: db-h2
     run_list:
       - recipe[gerrit::default]
     excludes: ["ubuntu-13.10"]
-  - name: DB-MYSQL
+  - name: db-mysql
     run_list:
       - recipe[gerrit::default]
     attributes:
@@ -44,7 +44,7 @@ suites:
         server_debian_password: "foo"
         server_root_password: "foo"
         server_repl_password: "foo"
-  - name: DB-POSTGRESQL
+  - name: db-postgresql
     run_list:
       - recipe[gerrit::default]
     attributes:
@@ -54,7 +54,7 @@ suites:
       postgresql:
         password:
           postgres: "foo"
-  - name: PROXY-NONE
+  - name: proxy-none
     run_list:
       - recipe[gerrit::default]
     attributes:

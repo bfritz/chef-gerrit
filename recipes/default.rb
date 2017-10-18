@@ -27,10 +27,6 @@ include_recipe "gerrit::_system"
 include_recipe "gerrit::_config"
 include_recipe "gerrit::_database"
 
-if node['gerrit']['proxy']['enable']
-  include_recipe "gerrit::proxy"
-end
-
 include_recipe "gerrit::_deploy"
 include_recipe "gerrit::_replication"
 
@@ -58,6 +54,11 @@ end
 
 ruby_block "wait_until_ready" do
   block do
-    wait_until_ready!
+     # listenUri = URI()
+#     # uri = "#{listenUri.scheme}://localhost:#{listenUri.port}"
+    # FIXME do not hardcode
+     uri = "http://localhost:8080"
+     Chef::Log.info "Waiting for #{uri}"
+     wait_until_ready!(uri, 301)
   end
 end
