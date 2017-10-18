@@ -91,6 +91,7 @@ module Gerrit
           Errno::ECONNREFUSED,
           Errno::ECONNRESET,
           Errno::ENETUNREACH,
+          Errno::EADDRNOTAVAIL,
           Timeout::Error,
           OpenURI::HTTPError => e
           return if e.message =~ /^#{status}/
