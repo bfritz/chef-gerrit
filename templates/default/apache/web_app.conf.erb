@@ -1,0 +1,41 @@
+<VirtualHost *:<%= node['gerrit']['proxy']['ssl'] ? '443' : (@params[:server_port] || node['apache']['listen_ports'].first) %>>
+  ServerName <%= @params[:server_name] %>
+  ServerAlias <% @params[:server_aliases].each do |a| %><%= "#{a}" %> <% end %>
+  DocumentRoot <%= @params[:docroot] %>
+ 
+  <% if node['gerrit']['proxy']['ssl'] %>
+  SSLEngine on
+  SSLProxyEngine on
+  SSLCertificateFile     <%= @params[:ssl_certfile] %>
+  SSLCertificateKeyFile  <%= @params[:ssl_keyfile] %>
+  <% if @params[:ssl_cabundle] %>
+  SSLCACertificateFile   <%= @params[:ssl_cabundle] %>
+  <% end %>
+  <% end %>
+  
+  LogLevel info
+  ErrorLog <%= node[:apache][:log_dir] %>/<%= @params[:name] %>-error.log
+  CustomLog <%= node[:apache][:log_dir] %>/<%= @params[:name] %>-access.log combined
+
+  ProxyRequests Off
+  ProxyVia Off
+  ProxyPreserveHost On
+
+  <Proxy *>
+    Order deny,allow
+    Allow from all
+  </Proxy>
+
+  AllowEncodedSlashes On
+  ProxyPass        /   http://localhost:8080/ nocanon
+</VirtualHost>
+
+<% if node['gerrit']['proxy']['ssl'] %>
+<VirtualHost *:80>
+  ServerName <%= @params[:server_name] %>
+  ServerAlias <% @params[:server_aliases].each do |a| %><%= "#{a}" %> <% end %>
+
+  RewriteEngine On
+  RewriteRule (.*) https://%{HTTP_HOST}$1
+</VirtualHost>
+<% end %>

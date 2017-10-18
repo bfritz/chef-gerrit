@@ -1,10 +1,15 @@
-maintainer       "Myplanet Digital"
-maintainer_email "patrick@myplanetdigital.com"
-license          "GNU Public License 3.0"
+name             "gerrit"
+maintainer       "Steffen Gebert"
+maintainer_email "steffen.gebert@typo3.org"
+license          "Apache 2.0"
 description      "Installs/Configures gerrit"
-long_description IO.read(File.join(File.dirname(__FILE__), 'README.rdoc'))
-version          "0.0.1"
+long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
+version          IO.read(File.join(File.dirname(__FILE__), 'VERSION')) rescue '0.0.1'
 
-%w{ build-essential mysql database java git }.each do |cookbook|
-  depends cookbook
-end
+depends "apache2"
+depends "build-essential"
+depends "database", "= 1.3.12"
+depends "mysql", "= 1.3.0"
+depends "java"
+depends "git"
+depends "systemd", "< 3.0"

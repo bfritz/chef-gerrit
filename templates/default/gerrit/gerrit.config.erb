@@ -1,0 +1,23 @@
+<% node['gerrit']['config'].each do |section, entries| %>
+[<%= section %>]
+<% entries.select do |key, value|
+  # reject all attributes specified as part of the secure.config file
+  # this is not implemented through #reject, because of CHEF-4844
+  ! node['gerrit']['secure_config'][section] || ! node['gerrit']['secure_config'][section][key]
+end.each do |k,v|
+  if v.kind_of?(Array)
+    v.each do |subv|
+%>
+	<%=k%> = <%= subv%>
+<%
+    end
+  else
+    # wrap values that contain a '#' in double quotes
+    v = '"' + v + '"' if v.to_s.include? '#'
+    # \ are removed by erubis, make sure they appear as specified
+    v = v.gsub("\\", "\\\\\\") if v.to_s.include? "\\"
+%>
+	<%= k %> = <%= v %>
+<% end %>
+<% end %>
+<% end %>
