@@ -18,11 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-## Otherwise the chef_gem[mysql] fails to install
-build_essential 'install_packages' do
-  compile_time true
-end
-
 include_recipe "mysql::client"
 include_recipe "mysql::server"
 include_recipe "database::mysql"
