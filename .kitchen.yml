@@ -19,10 +19,7 @@ provisioner:
           restTokenPrivateKey: 123123123
 
 platforms:
-  - name: debian-8.5
-    attributes:
-      apt:
-        compile_time_update: true
+  - name: debian-8.9
     run_list:
       - recipe[apt::default]
       - recipe[gerrit_test::wget]
