@@ -20,7 +20,7 @@ action :create do
     owner node['gerrit']['user']
     group node['gerrit']['group']
     mode 0755
-    source "hooks/wrapper.sh"
+    source "gerrit/hooks-wrapper.sh"
   end
 
   # create the directory containing the single hook files, which will
