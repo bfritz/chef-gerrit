@@ -25,5 +25,15 @@ control 'gerrit-1' do
     its('exit_status') { should eq 0 }
     its('stdout') { should include '<title>Gerrit Code Review</title>' }
   end
+end
 
+control 'gerrit-2' do
+  title 'Gerrit Features'
+
+  describe file('/var/gerrit/review/hooks/patchset-created') do
+    it { should exist }
+    it { should be_executable }
+    its('stdout') { should include 'Hello World'} # this comes from the test cookbook
+  end
+  
 end
