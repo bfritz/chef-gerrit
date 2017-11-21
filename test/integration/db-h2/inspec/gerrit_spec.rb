@@ -35,5 +35,11 @@ control 'gerrit-2' do
     it { should be_executable }
     its('stdout') { should include 'Hello World'} # this comes from the test cookbook
   end
-  
+
+  describe file('/var/gerrit/review/hooks/patchset-created.d/test.sh') do
+    it { should exist }
+    it { should be_executable }
+    its('content') { should include 'Hello World'}
+    its('stdout') { should include 'Hello World'}
+  end
 end
