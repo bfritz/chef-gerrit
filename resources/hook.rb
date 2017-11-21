@@ -17,6 +17,7 @@ action :create do
 
   # create the wrapper script, which will call all files in the #{hook}.d/ directory
   template "#{node['gerrit']['install_dir']}/hooks/#{new_resource.event}" do
+    cookbook 'gerrit'
     owner node['gerrit']['user']
     group node['gerrit']['group']
     mode 0755
