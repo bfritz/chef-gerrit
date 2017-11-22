@@ -1,0 +1,5 @@
+Berksfile.lock
+.kitchen/
+.kitchen.local.yml
+.idea/
+.vagrant/

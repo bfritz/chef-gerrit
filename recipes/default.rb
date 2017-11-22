@@ -2,7 +2,7 @@
 # Cookbook Name:: gerrit
 # Recipe:: default
 #
-# Copyright 2011, Myplanet Digital
+# Copyright 2012, Steffen Gebert / TYPO3 Association
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,93 +18,47 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-user "gerrit2" do
-  uid "2345"
-  gid "gerrit2"
-  home "/home/gerrit2"
-  comment "Gerrit system user"
-  action :manage
+include_recipe "git"
+include_recipe "java"
+# used later on to restart after JRE update
+include_recipe "java::notify"
+
+include_recipe "gerrit::_system"
+include_recipe "gerrit::_config"
+include_recipe "gerrit::_database"
+
+include_recipe "gerrit::_deploy"
+include_recipe "gerrit::_replication"
+
+if node['gerrit']['peer_keys']['enabled']
+  include_recipe "gerrit::peer_keys"
 end
 
-remote_file "/home/gerrit2/gerrit.war" do
-  owner "gerrit2"
-  source "http://gerrit.googlecode.com/files/gerrit-#{node['gerrit']['version']}.war"
+if node['gerrit']['batch_admin_user']['enabled']
+  include_recipe "gerrit::batch_admin"
 end
 
-require_recipe "build-essential"
-require_recipe "mysql"
-require_recipe "mysql::server"
-require_recipe "database"
-
-mysql_connection_info = {
-    :host =>  "localhost",
-    :username => "root",
-    :password => node['mysql']['server_root_password']
-  }
-
-mysql_database "reviewdb" do
-  connection mysql_connection_info
-  action :create
+# we have to split up the service because of the immediate notification
+service "gerrit-definition" do
+  service_name "gerrit"
+  supports :status => false, :restart => true, :reload => true
+  action :enable
 end
 
-mysql_database "changing the charset of reviewdb" do
-  connection mysql_connection_info
-  action :query
-  sql "ALTER DATABASE reviewdb charset=latin1"
+service "gerrit" do
+  action :start
+  subscribes :restart, 'log[jdk-version-changed]', :delayed
+  # proceed only after finished restart
+  notifies :run, 'ruby_block[wait_until_ready]', :immediately
 end
 
-mysql_database_user "gerrit2" do
-  connection mysql_connection_info
-  password node['mysql']['server_root_password']
-  action :create
+ruby_block "wait_until_ready" do
+  block do
+     # listenUri = URI()
+#     # uri = "#{listenUri.scheme}://localhost:#{listenUri.port}"
+    # FIXME do not hardcode
+     uri = "http://localhost:8080"
+     Chef::Log.info "Waiting for #{uri}"
+     wait_until_ready!(uri, 301)
+  end
 end
-
-mysql_database_user "gerrit2" do
-  connection mysql_connection_info
-  database_name "reviewdb"
-  privileges [
-    :all
-  ]
-  action :grant
-end
-
-mysql_database "flushing mysql privileges" do
-  connection mysql_connection_info
-  action :query
-  sql "FLUSH PRIVILEGES"
-end
-
-require_recipe "java"
-require_recipe "git"
-
-bash "Initializing Gerrit site" do
-  user "gerrit2"
-  group "gerrit2"
-  cwd "/home/gerrit2"
-  code <<-EOH
-  java -jar gerrit.war init -d review_site
-  EOH
-end
-
-#template "" do
-#  source
-#end
-
-bash "Starting gerrit daemon" do
-  user "gerrit2"
-  group "gerrit2"
-  code <<-EOH
-  ./home/gerrit2/review_site/bin/gerrit.sh start
-  EOH
-end
-
-link "/etc/init.d/gerrit.sh" do
-  to "/home/gerrit2/review_site/bin/gerrit.sh"
-end
-
-link "/etc/rc3.d/S90gerrit" do
-  to "../init.d/gerrit.sh"
-end
-
-#service "gerrit" do
-#end
